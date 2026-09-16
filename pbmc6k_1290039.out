@@ -1,0 +1,41 @@
+===== Job information =====
+Dataset: pbmc6k
+Node: bignode2.priv.bmi.emory.edu
+Start time: Wed Sep 16 08:30:59 EDT 2026
+Working directory: /home/lzha664/bmi500_hw2
+===========================
+[timing] imports: 2.748 s
+scanpy==1.10.2 anndata==0.12.19 umap==0.5.12 numpy==1.26.4 scipy==1.17.1 pandas==2.3.3 scikit-learn==1.9.1 statsmodels==0.15.0 igraph==0.11.6 louvain==0.8.2 pynndescent==0.6.0
+using 1 threads
+[timing] scanpy settings: 7.268 s
+[timing] argument parsing: 0.001 s
+[timing] I/O: 0.192 s
+[timing] filtering: 0.083 s
+[timing] normalization: 0.086 s
+[timing] highly variable genes: 0.081 s
+[timing] scale: 0.076 s
+[timing] PCA: 0.572 s
+[timing] neighbors: 4.231 s
+[timing] louvain clustering: 0.386 s
+[timing] UMAP: 16.079 s
+[timing] write h5ad: 0.210 s
+[timing] rank_genes_groups: 3.539 s
+[cProfile] saved to pbmc6k_rank_genes_groups.prof
+
+=== elapsed time per section ===
+   2.748 s  imports
+   7.268 s  scanpy settings
+   0.001 s  argument parsing
+   0.192 s  I/O
+   0.083 s  filtering
+   0.086 s  normalization
+   0.081 s  highly variable genes
+   0.076 s  scale
+   0.572 s  PCA
+   4.231 s  neighbors
+   0.386 s  louvain clustering
+  16.079 s  UMAP
+   0.210 s  write h5ad
+   3.539 s  rank_genes_groups
+  35.551 s  TOTAL (instrumented sections)
+End time: Wed Sep 16 08:31:35 EDT 2026

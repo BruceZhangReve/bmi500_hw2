@@ -1,0 +1,405 @@
+================================================================================
+AI-ASSISTED CODE GENERATION LOG — BMI500 (Week 3) Homework 2
+================================================================================
+
+Session date ............ 2026-09-13
+Assignment .............. BMI500 W3 HW2: matrix-vector multiplication
+Working directory ....... /Users/zhanglige/Desktop/Under+PhD Courses/PhD_FirstYear/BMI500/W3
+Files generated ......... bmi500_hw2/matvec_multiply.py
+                          bmi500_hw2/matvec_tests.py
+Test environment ........ conda environment "bmi500" (as requested by the user)
+                          (/Users/zhanglige/opt/anaconda3/envs/bmi500)
+
+--------------------------------------------------------------------------------
+SECTION 1 — LLM / CODING ASSISTANT (AGENT FRAMEWORK) AND MODEL VERSION
+--------------------------------------------------------------------------------
+
+Assistant / agent framework:
+  - Claude Code: Anthropic's official command-line coding agent (CLI).
+  - Runtime: Claude Agent SDK, running inside the VSCode native extension.
+  - Platform: macOS (Darwin 24.6.0), shell zsh.
+
+Model:
+  - Model requested by the user with the local command: /model opus
+  - Session-reported model after selection: deepseek-v4-pro
+    (command output: "Set model to deepseek-v4-pro")
+  - The session environment states: "You are powered by the model deepseek-v4-pro".
+
+--------------------------------------------------------------------------------
+SECTION 2 — USER PROMPTS (verbatim, in order)
+--------------------------------------------------------------------------------
+
+Prompt 1:
+  "Generate the code based on the instructions written in the matvec_multily.py
+   file. Please use the bmi500 environment if you want to do any potential test."
+
+Prompt 2:
+  "Could you also double-check possible failure modes for your matvec_multiply
+   function (e.g., maybe some problems with particular inputs, or something
+   alike), and add logic to guard them."
+
+Prompt 3:
+  "Can you document my prompts, the LLM and coding assistant (agent framework)
+   used, version of model, conversations. Save everything in AI_code_gen.txt."
+
+--------------------------------------------------------------------------------
+SECTION 3 — CONVERSATION RECORD (assistant actions per user turn)
+--------------------------------------------------------------------------------
+
+Turn 1 — Initial implementation (in response to Prompt 1):
+
+  1. Listed the W3 directory; the file was not at the top level, so searched
+     recursively and located bmi500_hw2/matvec_multiply.py and
+     bmi500_hw2/matvec_tests.py (both skeletons with instruction comments).
+     Also read README.md and requirements.txt for context.
+  2. Implemented bmi500_hw2/matvec_multiply.py:
+       - dot_product(vector1, vector2): computes the dot product with a
+         for loop, with docstring and comments; raises ValueError on length
+         mismatch.
+       - matvec_multiply(matrix, vector): computes the matrix-vector product
+         by applying dot_product to each row of the matrix; raises ValueError
+         for an empty matrix.
+       - main(): builds a random 1000x1000 matrix and a random vector of
+         length 1000, computes the product, and verifies one randomly chosen
+         row against an independent computation.
+  3. Implemented bmi500_hw2/matvec_tests.py: 10 unittest tests
+     (5 for dot_product, 5 for matvec_multiply), covering known values,
+     empty vectors, negative/zero values, identity matrix, single row, and
+     the two error cases.
+  4. Tested in the bmi500 conda environment as requested:
+       - "python -m unittest matvec_tests -v" -> Ran 10 tests, OK.
+       - "python matvec_multiply.py" -> Result length 1000 (expected 1000);
+         Row 540 check: computed 255.474339, expected 255.474339;
+         "Matrix-vector product computed correctly."
+
+Turn 2 — Robustness hardening (in response to Prompt 2):
+
+  1. Audited possible failure modes of matvec_multiply:
+       - matrix = None or another non-list   -> cryptic TypeError from len()
+       - flat list used as a matrix           -> scalar "rows", cryptic error
+       - jagged matrix (rows of unequal len)  -> failure only mid-computation
+       - row length != vector length          -> failure only mid-computation
+       - non-numeric entries ("a", None)      -> TypeError deep in the loop
+       - vector not a list                    -> cryptic TypeError
+  2. Added guards:
+       - dot_product: TypeError if either input is not a list; TypeError if
+         any entry is not an int/float (message includes the offending types
+         and index); ValueError on length mismatch (kept).
+       - matvec_multiply: validates up front — TypeError for a non-list
+         matrix/vector/row (with row index), ValueError for an empty matrix,
+         ValueError for any row whose length differs from the vector's
+         (jagged matrix; message includes the row index and both lengths).
+  3. Added 7 new tests covering each guard (17 tests total).
+  4. Re-tested in the bmi500 conda environment:
+       - "python -m unittest matvec_tests -v" -> Ran 17 tests, OK.
+       - "python matvec_multiply.py" -> Result length 1000 (expected 1000);
+         Row 125 check: computed 240.204720, expected 240.204720;
+         "Matrix-vector product computed correctly."
+         Runtime: 0.263 s total (0.24 s user), i.e. the added validation
+         has negligible cost.
+  5. Documented one deliberate non-guard: float('nan') is a valid float, so
+     it propagates through the computation as NaN instead of raising (the
+     assertion in main() would catch it). Offered to reject NaN explicitly
+     if desired.
+
+Turn 3 — Documentation (in response to Prompt 3):
+
+  1. Created this file, bmi500_hw2/AI_code_gen.txt, containing the user's
+     prompts, the assistant/model information, this conversation record,
+     the test results, and the final generated code (Appendix).
+
+--------------------------------------------------------------------------------
+SECTION 4 — TEST RESULTS (bmi500 conda environment)
+--------------------------------------------------------------------------------
+
+Unit tests (final run, 17 tests):
+
+  test_empty_vectors (TestDotProduct) .............. ok
+  test_known_vectors (TestDotProduct) .............. ok
+  test_length_mismatch_raises (TestDotProduct) ..... ok
+  test_negative_values (TestDotProduct) ............ ok
+  test_non_list_input_raises (TestDotProduct) ...... ok
+  test_non_numeric_entries_raise (TestDotProduct) .. ok
+  test_zero_vector (TestDotProduct) ................ ok
+  test_empty_matrix_raises (TestMatVecMultiply) .... ok
+  test_flat_list_matrix_raises (TestMatVecMultiply). ok
+  test_identity_matrix (TestMatVecMultiply) ........ ok
+  test_jagged_matrix_raises (TestMatVecMultiply) ... ok
+  test_known_product (TestMatVecMultiply) .......... ok
+  test_matrix_not_a_list_raises (TestMatVecMultiply) ok
+  test_non_numeric_entry_raises (TestMatVecMultiply) ok
+  test_row_length_mismatch_raises (TestMatVecMultiply) ok
+  test_single_row (TestMatVecMultiply) ............. ok
+  test_vector_not_a_list_raises (TestMatVecMultiply) ok
+
+  Ran 17 tests in 0.000s — OK
+
+main() run (1000x1000 random data):
+
+  Result length: 1000 (expected 1000)
+  Row 125 check: computed 240.204720, expected 240.204720
+  Matrix-vector product computed correctly.
+  Runtime: 0.263 s total.
+
+--------------------------------------------------------------------------------
+SECTION 5 — APPENDIX: FINAL GENERATED CODE
+--------------------------------------------------------------------------------
+
+--- bmi500_hw2/matvec_multiply.py ---------------------------------------------
+
+import random
+
+# create a function to compute the dot product of two vectors using a for loop
+# add comments for the selected function
+
+
+def dot_product(vector1, vector2):
+    """Compute the dot product of two vectors using a for loop.
+
+    The dot product is the sum of the element-wise products of the two
+    vectors, i.e. sum(vector1[i] * vector2[i]) over all indices i.
+
+    Args:
+        vector1 (list): the first vector
+        vector2 (list): the second vector
+
+    Returns:
+        float: the dot product of vector1 and vector2
+
+    Raises:
+        TypeError: if either argument is not a list, or if any entry is
+            not an int or float
+        ValueError: if the two vectors do not have the same length
+    """
+    # guard: both inputs must be lists
+    if not isinstance(vector1, list) or not isinstance(vector2, list):
+        raise TypeError("Both inputs must be lists of numbers.")
+
+    # guard: a dot product is only defined for vectors of equal length
+    if len(vector1) != len(vector2):
+        raise ValueError("Vectors must have the same length to compute a dot product.")
+
+    result = 0.0
+    # accumulate the element-wise products one index at a time
+    for i in range(len(vector1)):
+        # guard: every entry must be a number before it can be multiplied
+        if not isinstance(vector1[i], (int, float)) or not isinstance(
+            vector2[i], (int, float)
+        ):
+            raise TypeError(
+                f"Vector entries must be ints or floats; got "
+                f"{type(vector1[i]).__name__} and {type(vector2[i]).__name__} "
+                f"at index {i}."
+            )
+        result += vector1[i] * vector2[i]
+    return result
+
+
+# create a function to compute the matrix-vector product using the dot_product function
+# add comments for the selected function
+
+
+def matvec_multiply(matrix, vector):
+    """Compute the matrix-vector product using the dot_product function.
+
+    Treats every row of the matrix as a vector and takes its dot product
+    with the input vector; the i-th entry of the result is therefore the
+    dot product of row i of the matrix with the vector.
+
+    Args:
+        matrix (list of list): an n x m matrix stored as a list of n rows
+        vector (list): a vector of length m
+
+    Returns:
+        list: a vector of length n, the matrix-vector product
+
+    Raises:
+        TypeError: if the matrix or vector is not a list, if any row is
+            not a list, or if any entry is not an int or float (raised
+            by dot_product)
+        ValueError: if the matrix is empty, or if any row has a length
+            different from the vector
+    """
+    # guard: the matrix must be a list of rows
+    if not isinstance(matrix, list):
+        raise TypeError("Matrix must be a list of rows.")
+
+    # guard: an empty matrix has no rows, so the product is undefined
+    if len(matrix) == 0:
+        raise ValueError("Matrix cannot be empty.")
+
+    # guard: the vector must be a list
+    if not isinstance(vector, list):
+        raise TypeError("Vector must be a list.")
+
+    # guard: every row must be a list, and its length must match the
+    # vector length (a jagged matrix has no well-defined product)
+    for i, row in enumerate(matrix):
+        if not isinstance(row, list):
+            raise TypeError(
+                f"Row {i} is not a list; the matrix must be a list of rows."
+            )
+        if len(row) != len(vector):
+            raise ValueError(
+                f"Row {i} has length {len(row)}, but the vector has length "
+                f"{len(vector)}; every row must match the vector length."
+            )
+
+    # dot the input vector with every row of the matrix
+    result = []
+    for row in matrix:
+        result.append(dot_product(row, vector))
+    return result
+
+
+# create a main function to test the matrix-vector product function using randomly generated data of size 1000x1000
+# add comments for the selected function
+
+
+def main():
+    """Test matvec_multiply with randomly generated 1000x1000 data.
+
+    Builds a random 1000 x 1000 matrix and a random vector of length
+    1000, computes the matrix-vector product, and checks a randomly
+    chosen entry of the result against an independent computation.
+    """
+    size = 1000
+
+    # random matrix with 1000 rows and 1000 columns
+    matrix = [[random.random() for _ in range(size)] for _ in range(size)]
+
+    # random vector of length 1000
+    vector = [random.random() for _ in range(size)]
+
+    # compute the matrix-vector product with our function
+    result = matvec_multiply(matrix, vector)
+
+    # sanity checks on the shape of the result
+    assert len(result) == size, "Result should have one entry per matrix row."
+    print(f"Result length: {len(result)} (expected {size})")
+
+    # verify one randomly chosen entry against an independent computation
+    row_index = random.randrange(size)
+    expected = sum(matrix[row_index][j] * vector[j] for j in range(size))
+    print(
+        f"Row {row_index} check: computed {result[row_index]:.6f}, "
+        f"expected {expected:.6f}"
+    )
+    assert abs(result[row_index] - expected) < 1e-9, "Computed entry does not match."
+    print("Matrix-vector product computed correctly.")
+
+
+if __name__ == "__main__":
+    main()
+
+--- bmi500_hw2/matvec_tests.py -------------------------------------------------
+
+# generate tests for matrix-vector-product function in matvec_multiply.py
+
+# generate tests for dot-product function in matvec_multiply.py
+
+import unittest
+
+from matvec_multiply import dot_product, matvec_multiply
+
+
+class TestDotProduct(unittest.TestCase):
+    """Tests for the dot-product function in matvec_multiply.py."""
+
+    def test_known_vectors(self):
+        # 1*4 + 2*5 + 3*6 = 32
+        self.assertEqual(dot_product([1, 2, 3], [4, 5, 6]), 32)
+
+    def test_empty_vectors(self):
+        # the dot product of two empty vectors is 0
+        self.assertEqual(dot_product([], []), 0)
+
+    def test_negative_values(self):
+        # (-1)*4 + 2*(-5) + (-3)*6 = -32
+        self.assertEqual(dot_product([-1, 2, -3], [4, -5, 6]), -32)
+
+    def test_zero_vector(self):
+        # anything dotted with the zero vector is 0
+        self.assertEqual(dot_product([1, 2, 3], [0, 0, 0]), 0)
+
+    def test_length_mismatch_raises(self):
+        # vectors of different lengths are invalid
+        with self.assertRaises(ValueError):
+            dot_product([1, 2], [1, 2, 3])
+
+    def test_non_list_input_raises(self):
+        # inputs that are not lists are invalid
+        with self.assertRaises(TypeError):
+            dot_product([1, 2], None)
+        with self.assertRaises(TypeError):
+            dot_product("ab", "cd")
+
+    def test_non_numeric_entries_raise(self):
+        # entries that are not numbers cannot be multiplied
+        with self.assertRaises(TypeError):
+            dot_product([1, "a"], [2, 3])
+        with self.assertRaises(TypeError):
+            dot_product([1, 2], [None, 3])
+
+
+class TestMatVecMultiply(unittest.TestCase):
+    """Tests for the matrix-vector-product function in matvec_multiply.py."""
+
+    def test_identity_matrix(self):
+        # the identity matrix times a vector returns the vector unchanged
+        identity = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+        vector = [5, -2, 7]
+        self.assertEqual(matvec_multiply(identity, vector), vector)
+
+    def test_known_product(self):
+        # row 0: 1*5 + 2*6 = 17, row 1: 3*5 + 4*6 = 39
+        matrix = [[1, 2], [3, 4]]
+        vector = [5, 6]
+        self.assertEqual(matvec_multiply(matrix, vector), [17, 39])
+
+    def test_single_row(self):
+        # a 1x3 matrix times a length-3 vector gives a length-1 result
+        self.assertEqual(matvec_multiply([[1, 2, 3]], [4, 5, 6]), [32])
+
+    def test_empty_matrix_raises(self):
+        # an empty matrix has no rows to dot with the vector
+        with self.assertRaises(ValueError):
+            matvec_multiply([], [1, 2])
+
+    def test_row_length_mismatch_raises(self):
+        # a row longer than the vector makes the dot product undefined
+        with self.assertRaises(ValueError):
+            matvec_multiply([[1, 2, 3]], [1, 2])
+
+    def test_matrix_not_a_list_raises(self):
+        # a matrix that is not a list is invalid
+        with self.assertRaises(TypeError):
+            matvec_multiply(None, [1, 2])
+
+    def test_flat_list_matrix_raises(self):
+        # a flat list has scalar "rows", so it is not a valid matrix
+        with self.assertRaises(TypeError):
+            matvec_multiply([1, 2, 3], [1, 2, 3])
+
+    def test_jagged_matrix_raises(self):
+        # rows of different lengths make the product undefined
+        with self.assertRaises(ValueError):
+            matvec_multiply([[1, 2, 3], [4, 5]], [1, 2, 3])
+
+    def test_non_numeric_entry_raises(self):
+        # a non-numeric matrix entry cannot be multiplied
+        with self.assertRaises(TypeError):
+            matvec_multiply([[1, "a"], [3, 4]], [5, 6])
+
+    def test_vector_not_a_list_raises(self):
+        # a vector that is not a list is invalid
+        with self.assertRaises(TypeError):
+            matvec_multiply([[1, 2]], "12")
+
+
+if __name__ == "__main__":
+    unittest.main()
+
+================================================================================
+END OF LOG
+================================================================================

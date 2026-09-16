@@ -1,0 +1,6 @@
+python -m cProfile -o pbmc3k_output.prof scanpy_pbmc.py
+
+
+/usr/bin/time -v python scanpy_pbmc.py > pbmc3k.log 2>&1 --data-set pbmc3k
+/usr/bin/time -v python scanpy_pbmc.py > pbmc6k.log 2>&1 --data-set pbmc6k
+/usr/bin/time -v python scanpy_pbmc.py > pbmc10k.log 2>&1 --data-set pbmc10k

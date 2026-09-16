@@ -1,0 +1,29 @@
+#!/bin/bash
+#SBATCH --job-name=pbmc3k
+#SBATCH --output=pbmc3k_%j.out
+#SBATCH --error=pbmc3k_%j.err
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=16G
+#SBATCH --time=0:05:00
+
+set -eo pipefail
+
+cd "$SLURM_SUBMIT_DIR"
+
+source ~/.bashrc
+conda activate bmi500
+
+echo "===== Job information ====="
+echo "Dataset: pbmc3k"
+echo "Node: $(hostname)"
+echo "Start time: $(date)"
+echo "Working directory: $(pwd)"
+echo "==========================="
+
+/usr/bin/time -v python scanpy_pbmc.py \
+    --data-dir data \
+    --data-set pbmc3k \
+    --num-threads 1
+
+
+echo "End time: $(date)"

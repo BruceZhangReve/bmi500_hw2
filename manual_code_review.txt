@@ -1,0 +1,67 @@
+Before reviewing, we try to run the provided code test:
+
+python matvec_tests.py 
+.................
+------------------------------------------------
+Ran 17 tests in 0.000s
+OK
+
+The code pass through all the tests, let's start reviewing.
+
+##############################################################################
+1. Code well-designed?
+
+Yes, the implementation is correct, the docstrings for each function are clear to users, and matvec_multiply actually reuses dot_product as the file asks. However, I find two weak points in the design. First, the validation is repeated: dot_product checks the type of every entry again on every call, while matvec_multiply has already checked the whole row, so an n * m product does n*m extra type checks. Second, the empty input is not handled consistently: matvec_multiply([], []) raises a ValueError, but matvec_multiply([[]], []) silently returns [0.0], even though neither case has anything to multiply.
+
+2. Functionality good for users?
+
+No, the input must be a python list datatype, and it returns an error if this requirement is not satisfied. Nevertheless, in real-world scenarios, we should design functions that can take in different (commonly-used) datatypes, for example a tuple or a numpy array. \
+
+3. UI changes look good?
+
+N/A, this code has no UI. If we treat the function signature as the interface, then I think it looks simple to interact with.
+
+4. Any parallel programming done safely?
+
+N/A, this code does not incorporate any parallel computing.
+
+5. The code isn’t more complex than it needs to be?
+
+Yes, it simply uses a for loop, and the logic is simple and clear. The repeated type check I mentioned in comment 1 is the only work that I would call unnecessary, and it does not make the code harder to read.
+
+6. The developer isn’t implementing things they might need in the future but don’t know they need now?
+
+Yes, but this is in tension with my comment 2. The code only does what the task asks, and I think keeping it this small is the right choice here; supporting other datatypes is my wish for future reuse, maybe it's not something this code needs now.
+
+7. Code has appropriate unit tests?
+
+Yes, matvec_tests.py covers the normal cases (e.g., known product, identity matrix) and many error cases (e.g., non-list input, non-numeric entry), so it looks very comprehensive to me.
+
+8. Tests are well-designed.
+
+Yes, I think the assertions are correct, and each test checks one behaviour. But I find two gaps: there is no test with float inputs, and the non-numeric entry is only tested on the matrix side, never on the vector that is passed through matvec_multiply.
+
+9. The developer used clear names for everything?
+
+Yes, but I think names could be simplified in certain places (e.g., vector1 -> vec1). Because things will look complicated if we build more functions later on.
+
+10. Comments are clear and useful, and mostly explain why instead of what.
+
+Partly. The comments that explain a reason are useful, for example the ones that say a jagged matrix has no well-defined product, and the error messages that report the row index and both lengths. But other comments only repeat the line below them, like this section in main():
+
+    # random vector of length 1000
+    vector = [random.random() for _ in range(size)]
+
+We don't need to comment here, it is very easy to identify the code. 
+
+11. Code is appropriately documented?
+
+Mostly yes, currently the programmer is only introducing the codebase in the beginning of the file, which is sufficient for now, because it has limited functions. But I would recommend to update the README.md to further clarify the function of each script.
+
+12. The code conforms to our style guides?
+
+Mostly yes.
+
+Overall, I think the code is correct and easy to read. The two things I would change are: check the input once instead of on every row, and add a few tests for float inputs and for the vector side.
+
+
